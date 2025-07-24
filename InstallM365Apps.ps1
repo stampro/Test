@@ -1,3 +1,31 @@
+Write-Host -ForegroundColor Cyan "Starting RobOSD's Custom OSDCloud ..."
+Start-Sleep -Seconds 5
+
+#Change Display Resolution for Virtual Machine
+if ((Get-MyComputerModel) -match 'Virtual') {
+    Write-Host -ForegroundColor Cyan "Setting Display Resolution to 1600x"
+    Set-DisRes 1600
+}
+
+#Make sure I have the latest OSD Content
+Write-Host -ForegroundColor Cyan "Updating the awesome OSD PowerShell Module"
+Install-Module OSD -Force
+
+Write-Host -ForegroundColor Cyan "Importing the sweet OSD PowerShell Module"
+Import-Module OSD -Force
+
+#TODO: Spend the time to write a function to do this and put it here
+Write-Host -ForegroundColor Cyan "Ejecting ISO"
+Write-Warning "That didn't work because I haven't coded it yet!"
+#Start-Sleep -Seconds 5
+
+#Start OSDCloud ZTI the RIGHT way
+Write-Host -ForegroundColor Cyan "Start OSDCloud with MY Parameters"
+Start-OSDCloud -OSLanguage en-us -OSVersion 'Windows 11' -OSBuild 24H2 -OSEdition Enterprise -OSActivation Volume -ZTI
+
+Write-Host -ForegroundColor Cyan "Starting OSDCloud PostAction ..."
+
+
 <#
 .SYNOPSIS
   Script to install M365 Apps as a Win32 App
@@ -24,13 +52,14 @@
         1.2.0 - (2022-23-11) Moved from ODT download to Evergreen url for setup.exe 
         1.2.1 - (2022-01-12) Adding function to validate signing on downloaded setup.exe
 #>
-#region parameters
+<#region parameters
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $false)]
     [string]$XMLUrl
 )
 #endregion parameters
+#>
 
 If (!([System.Diagnostics.EventLog]::SourceExists("M365Install"))) {
     New-EventLog -LogName "Application" -Source "M365Install"
@@ -272,5 +301,7 @@ if ($M365AppsCheck) {
     New-Item -Path C:\ProgramData\ -Name "M365Install" -ItemType File -Force | Out-Null
     Write-EventLog -LogName Application -Source "M365Install" -EventID 1007 -EntryType Information -Message "M365Install flag file created"
 }
+
+Restart-Computer -Force
 
 
